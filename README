@@ -1,0 +1,74 @@
+Instructions for sr620 users                    Last Updated 11/10/2014
+--------------------------------
+
+I - Building the SRS SR620 Time Interval Counter module:
+--------------------------------------------------------
+
+(1) The sr620 module uses streamdevice. There is no executable or library.
+
+(2) The template and protocol file are copied to the db directory, as IOCs expect.
+
+(3) Although a substitutions file may be used, generally the IOC just loads the database.
+    Define macro $(P), the PV prefix.
+
+
+II - Adding the sr620 package to your IOC application:
+--------------------------------------------------------
+(1)Link asyn and streamdevice libraries into your app by adding to 
+    xxxApp/src/Makefile:
+
+   xxx_LIBS += asyn
+   xxx_LIBS += stream
+   USR_SYS_LIBS += pcre (dependency of streamdevice)
+   
+Note that the order of the above libraries is important.
+
+(2) Add the following .dbd files to xxxApp/src/Makefile 
+    or to xxxApp/src/xxxInclude.dbd:
+
+   xxx_DBD += stream.dbd
+   xxx_DBD += asyn.dbd
+   xxx_DBD += drvAsynIPPort.dbd
+   xxx_DBD += drvVxi11.dbd
+   xxx_DBD += drvAsynSerialPort.dbd
+
+(4) Add Hp53131A protocol and databases to your application. In your xxxApp/Db/Makefile add:
+
+   DB_INSTALLS += sr620.proto
+   DB_INSTALLS += sr620.db
+
+
+III - Adding sr620 database and network configuration to your IOC startup file:
+---------------------------------------------------------------------------------
+(1) Add protocol path
+
+## Location of stream protocol files
+epicsEnvSet "STREAM_PROTOCOL_PATH", "${TOP}/db"
+
+(2) Add asyn network configuration before iocInit.
+	
+	# ======================================================================
+	# Setup SRS620
+	# **********************************************************************
+	# If using Digi Terminal Server directly:
+	# **********************************************************************
+	# Digi should be setup for raw mode
+	# Raw mode port = 2100 + channel number, e.g. :2105
+	# Digi Terminal Server Info:
+	# Digi Model: PortServer TS 16
+	# Digi Server name is "ts-??xx-??xx"
+	# Digi IP address:  172.27.xx.xx
+	# Digi channel Number used: channel 5
+	drvAsynIPPortConfigure ("<port>","ts-??xx-??xx:2105",0,0,0)
+	asynOctetSetInputEos("<port>",0,"\r\n")
+    asynOctetSetOutputEos("<port>",0,"\r\n")
+
+    Note that the <port> must match the $(P) macro used with sr620.db.
+    Each asyn device within an IOC must have a unique port name.
+
+(3) Before iocInit(), load the database file
+	dbLoadTemplate("db/sr620.db", "P=UTIC:LA20:10" )
+
+(4) A test EDM display is available for diagnostics:
+    sr620/<release>/agilent53210App/srcDisplay/sr620.edl
+    It requires a $(DEV) macro that matches $(P) in sr620.db.

@@ -1,0 +1,38 @@
+# streamDevice protocol for SRS SR620 Universal Time Interval Counter
+# Author: Karl Gumerlock (klg)
+
+# Parameters
+OutTerminator   = CR;
+InTerminator    = CR LF;
+ReplyTimeout = 3000;
+ReadTimeout  = 100;
+WriteTimeout = 100;
+ExtraInput   = Ignore;
+
+# Write a debug string and read in the response
+sendDebug        { ExtraInput = Ignore;
+                   out "%s";          in "%39c"   }
+
+# Write a raw command (no arguments and no return value)
+writeCmd         { out "\$1";                     }
+
+# Read/write an integer
+readInt          { out "\$1?";        in "%i"     }
+writeInt         { out "\$1 %i"                   }
+
+# Read/write an integer to a specific channel 0=EXT, 1=A, 2=B
+readChanInt      { out "\$1? \$2";    in "%i"     }
+writeChanInt     { out "\$1 \$2,%i"               }
+
+# Read/write a float
+readFloat        { out "\$1?";        in "%f"     }
+writeFloat       { out "\$1 %f"                   }
+
+# Read/write a float to a specific channel 0=EXT, 1=A, 2=B
+# Also used for some commands that take enum input
+readChanFloat    { out "\$1? \$2";    in "%f"     }
+writeChanFloat   { out "\$1 \$2,%f"               }
+
+# Read/write a string
+readStr          { out "\$1?";        in "%39c"   }
+writeStr         { out "\$1 %39c"                 }

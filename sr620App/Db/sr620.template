@@ -1,0 +1,1858 @@
+# Record Database template for SRS SR620 Universal Time Interval Counter
+# Based partly on dhzhang's SMC100 implementation
+# Author: Karl Gumerlock (klg)
+
+# Debug record
+record(stringout, "$(P):SendDebug") {
+    field(DESC, "Send debug command")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto sendDebug() $(P)")
+}
+
+# Periodic update record - EVNT#1
+# All readback values are keyed on this record's SCAN period using a fanout
+record(event, "$(P):UpdateAll") {
+    field(DESC, "Update all periodic RBvalues")
+    field(DTYP, "Soft Channel")
+    field(VAL,  "1")
+    field(SCAN, "10 second")
+    field(FLNK, "$(P):UpdateAll:FRoot")
+    field(PINI, "YES")
+	info(autosaveFields, "SCAN")
+}
+
+record(fanout, "$(P):UpdateAll:FRoot") {
+    field(DESC, "UpdateAll root fanout")
+    field(LNK1, "$(P):UpdateAll:F1")
+    field(LNK2, "$(P):UpdateAll:F2")
+    field(LNK3, "$(P):UpdateAll:F3")
+    field(LNK4, "$(P):UpdateAll:F4")
+    field(LNK5, "$(P):UpdateAll:F5")
+    field(LNK6, "$(P):UpdateAll:F6")
+}
+
+record(fanout, "$(P):UpdateAll:F1") {
+    field(DESC, "UpdateAll fanout 1")
+    field(LNK1, "$(P):UpdateAll:F1:1")
+    field(LNK2, "$(P):UpdateAll:F1:2")
+    field(LNK3, "$(P):UpdateAll:F1:3")
+    field(LNK4, "$(P):UpdateAll:F1:4")
+    field(LNK5, "$(P):UpdateAll:F1:5")
+}
+
+record(fanout, "$(P):UpdateAll:F1:1") {
+    field(DESC, "UpdateAll fanout 1.1")
+    field(LNK1, "$(P):A:GetTrigThreshold")
+    field(LNK2, "$(P):B:GetTrigThreshold")
+    field(LNK3, "$(P):GetRefLvlAmp")
+    field(LNK4, "$(P):A:GetInputCoupl")
+    field(LNK5, "$(P):B:GetInputCoupl")
+    field(LNK6, "$(P):EXT:GetInputTerm")
+}
+
+record(fanout, "$(P):UpdateAll:F1:2") {
+    field(DESC, "UpdateAll fanout 1.2")
+    field(LNK1, "$(P):DAC1:GetScanStepSize")
+    field(LNK2, "$(P):GetAutoprintMode")
+
+    field(LNK4, "$(P):GetDisplayGraphType")
+    field(LNK5, "$(P):GetGraphEnable")
+    field(LNK6, "$(P):GetGraphScaleHistV")
+}
+
+record(fanout, "$(P):UpdateAll:F1:3") {
+    field(DESC, "UpdateAll fanout 1.3")
+    field(LNK1, "$(P):GetGraphScaleHistH")
+    field(LNK2, "$(P):GetGraphScaleHistB")
+    field(LNK3, "$(P):GetGraphScaleMean")
+    field(LNK4, "$(P):GetGraphScaleJitter")
+    field(LNK5, "$(P):GetPrintingDevice")
+    field(LNK6, "$(P):GetPlotterAddress")
+}
+
+record(fanout, "$(P):UpdateAll:F1:4") {
+    field(DESC, "UpdateAll fanout 1.4")
+    field(LNK1, "$(P):GetPlotterPort")
+    field(LNK2, "$(P):GetDisplaySource")
+    field(LNK3, "$(P):GetExpandMode")
+    field(LNK4, "$(P):GetLastKeyPressed")
+    field(LNK5, "$(P):GetClockSource")
+    field(LNK6, "$(P):GetClockFreq")
+}
+
+record(fanout, "$(P):UpdateAll:F1:5") {
+    field(DESC, "UpdateAll fanout 1.5")
+    field(LNK1, "$(P):GetPrinterPortMode")
+    field(LNK2, "$(P):DVM0:GetVRange")
+    field(LNK3, "$(P):DVM1:GetVRange")
+    field(LNK4, "$(P):DVM0:GetV")
+    field(LNK5, "$(P):DVM1:GetV")
+}
+
+record(fanout, "$(P):UpdateAll:F2") {
+    field(DESC, "UpdateAll fanout 2")
+    field(LNK1, "$(P):A:GetInputTerm")
+    field(LNK2, "$(P):B:GetInputTerm")
+    field(LNK3, "$(P):A:GetTrigMode")
+    field(LNK4, "$(P):B:GetTrigMode")
+    field(LNK5, "$(P):EXT:GetTrigSlope")
+    field(LNK6, "$(P):A:GetTrigSlope")
+}
+
+record(fanout, "$(P):UpdateAll:F3") {
+    field(DESC, "UpdateAll fanout 3")
+    field(LNK1, "$(P):B:GetTrigSlope")
+    field(LNK2, "$(P):GetArmMode")
+    field(LNK3, "$(P):GetAutoMeasMode")
+    field(LNK4, "$(P):GetDispRELMode")
+    field(LNK5, "$(P):GetGatePeriod:Update")
+    field(LNK6, "$(P):GetVarianceType")
+}
+
+record(fanout, "$(P):UpdateAll:F4") {
+    field(DESC, "UpdateAll fanout 4")
+    field(LNK1, "$(P):GetInstrumentMode")
+    field(LNK2, "$(P):GetSampleSize")
+    field(LNK3, "$(P):GetMeasSource")
+#    field(LNK4, "$(P):ProcMeasAll")
+    field(LNK5, "$(P):GetDispREL")
+    field(LNK6, "$(P):GetDACOutputMode")
+}
+
+record(fanout, "$(P):UpdateAll:F5") {
+    field(DESC, "UpdateAll fanout 5")
+    field(LNK1, "$(P):GetDelayStartPos")
+    field(LNK2, "$(P):GetDelayScanMode")
+    field(LNK3, "$(P):GetDelayScanStepSize")
+    field(LNK4, "$(P):GetScanHoldTime")
+    field(LNK5, "$(P):GetScanMode")
+    field(LNK6, "$(P):GetLastScanPoint")
+}
+
+record(fanout, "$(P):UpdateAll:F6") {
+    field(DESC, "UpdateAll fanout 6")
+    field(LNK1, "$(P):GetNumScanPoints")
+    field(LNK2, "$(P):DAC0:GetScanStartV")
+    field(LNK3, "$(P):DAC1:GetScanStartV")
+    field(LNK4, "$(P):DAC0:GetOutputV")
+    field(LNK5, "$(P):DAC1:GetOutputV")
+    field(LNK6, "$(P):DAC0:GetScanStepSize")
+}
+
+# High speed update record - EVNT#2
+# Readback values that need to be on a faster update rate are keyed to this
+# record's SCAN period using a fanout - OK to double up with event 1
+record(event, "$(P):UpdateHighRate") {
+    field(DESC, "Update RBvalues at hi rate")
+    field(DTYP, "Soft Channel")
+    field(VAL,  "2")
+    field(FLNK, "$(P):UpdateHighRate:FRoot")
+    field(SCAN, "1 second")
+	info(autosaveFields, "SCAN")
+}
+
+record(fanout, "$(P):UpdateHighRate:FRoot") {
+    field(DESC, "UpdateHighRate fanout root")
+    field(LNK1, "$(P):ProcMeasAll")
+}
+
+# Read the identification string from the SR620
+record(stringin, "$(P):IDStr") {
+    field(DESC, "SR620 ID String")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readStr(*IDN) $(P)")
+    field(PINI, "YES")
+}
+
+# Execute a soft-reset using the *RST command
+# This should probably forward link to any readback record
+record(bo, "$(P):Reset") {
+    field(DESC, "Soft-reset SR620 controller")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeCmd(*RST) $(P)")
+}
+
+# Execute a self-test using the *TST command - if no error, returns 0
+record(ao, "$(P):ExecSelfTest") {
+    field(DESC, "Execute a self-test")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto readInt(*TST) $(P)")
+}
+
+# Trigger threshold for A/B LEVL
+record(ao, "$(P):A:SetTrigThreshold") {
+    field(DESC, "Set Chan A Trigger Threshold")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeChanFloat(LEVL,1) $(P)")
+    field(PREC, "2")
+    field(EGU,  "V")
+    field(FLNK, "$(P):A:GetTrigThreshold")
+	info(autosaveFields, "VAL HHSV HSV LSV LLSV HIHI HIGH LOW LOLO")
+}
+
+record(ai, "$(P):A:GetTrigThreshold") {
+    field(DESC, "Get Chan A Trigger Threshold")
+    field(DTYP, "stream")
+    field(PREC, "2")
+    field(EGU,  "V")
+    field(INP,  "@sr620.proto readChanFloat(LEVL,1) $(P)")
+	info(autosaveFields, "HHSV HSV LSV LLSV HIHI HIGH LOW LOLO")
+}
+
+record(ao, "$(P):B:SetTrigThreshold") {
+    field(DESC, "Set Chan B Trigger Threshold")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeChanFloat(LEVL,2) $(P)")
+    field(PREC, "2")
+    field(EGU,  "V")
+    field(FLNK, "$(P):B:GetTrigThreshold")
+	info(autosaveFields, "VAL HHSV HSV LSV LLSV HIHI HIGH LOW LOLO")
+}
+
+record(ai, "$(P):B:GetTrigThreshold") {
+    field(DESC, "Get Chan B Trigger Threshold")
+    field(DTYP, "stream")
+    field(PREC, "2")
+    field(EGU,  "V")
+    field(INP,  "@sr620.proto readChanFloat(LEVL,2) $(P)")
+	info(autosaveFields, "HHSV HSV LSV LLSV HIHI HIGH LOW LOLO")
+}
+
+# Manual Trigger MTRG
+record(bo, "$(P):ManualTrigger") {
+    field(DESC, "Manual Trigger")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(MTRG) $(P)")
+    field(ZNAM, "Stop Gate")
+    field(ONAM, "Start Gate")
+}
+
+# Front Panel Reference Level Amplitude RLVL
+record(bo, "$(P):SetRefLvlAmp") {
+    field(DESC, "Set Front Panel Ref Lvl Amp")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(RLVL) $(P)")
+    field(ZNAM, "ECL")
+    field(ONAM, "TTL")
+    field(FLNK, "$(P):GetRefLvlAmp")
+	info(autosaveFields, "VAL ZSV OSV")
+}
+
+record(bi, "$(P):GetRefLvlAmp") {
+    field(DESC, "Get Front Panel Ref Lvl Amp")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(RLVL) $(P)")
+    field(ZNAM, "ECL")
+    field(ONAM, "TTL")
+	info(autosaveFields, "ZSV OSV")
+}
+
+# AC/DC Coupling of Channel A and B inputs TCPL
+record(bo, "$(P):A:SetInputCoupl") {
+    field(DESC, "Set Chan A Inp AC/DC Coupl")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeChanInt(TCPL,1) $(P)")
+    field(ZNAM, "DC")
+    field(ONAM, "AC")
+    field(FLNK, "$(P):A:GetInputCoupl")
+	info(autosaveFields, "VAL ZSV OSV")
+}
+
+record(bi, "$(P):A:GetInputCoupl") {
+    field(DESC, "Get Chan A Inp AC/DC Coupl")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanInt(TCPL,1) $(P)")
+    field(ZNAM, "DC")
+    field(ONAM, "AC")
+	info(autosaveFields, "ZSV OSV")
+}
+
+record(bo, "$(P):B:SetInputCoupl") {
+    field(DESC, "Set Chan B Inp AC/DC Coupl")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeChanInt(TCPL,2) $(P)")
+    field(ZNAM, "DC")
+    field(ONAM, "AC")
+    field(FLNK, "$(P):B:GetInputCoupl")
+	info(autosaveFields, "VAL ZSV OSV")
+}
+
+record(bi, "$(P):B:GetInputCoupl") {
+    field(DESC, "Get Chan B Inp AC/DC Coupl")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanInt(TCPL,2) $(P)")
+    field(ZNAM, "DC")
+    field(ONAM, "AC")
+	info(autosaveFields, "ZSV OSV")
+}
+
+# Input Termination of EXT, A, B inputs TERM
+record(mbbo, "$(P):EXT:SetInputTerm") {
+    field(DESC, "Set EXT Input Termination")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeChanInt(TERM,0) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(ZRST, "50 Ohm")
+    field(ONST, "1 MOhm")
+    field(TWST, "UHF Prescalers")
+    field(FLNK, "$(P):EXT:GetInputTerm")
+	info(autosaveFields, "VAL UNSV COSV ZRSV ONSV TWSV")
+}
+
+record(mbbi, "$(P):EXT:GetInputTerm") {
+    field(DESC, "Get EXT Input Termination")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanInt(TERM,0) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(ZRST, "50 Ohm")
+    field(ONST, "1 MOhm")
+    field(TWST, "UHF Prescalers")
+	info(autosaveFields, "UNSV COSV ZRSV ONSV TWSV")
+}
+
+record(mbbo, "$(P):A:SetInputTerm") {
+    field(DESC, "Set A Input Termination")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeChanInt(TERM,1) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(ZRST, "50 Ohm")
+    field(ONST, "1 MOhm")
+    field(TWST, "UHF Prescalers")
+    field(FLNK, "$(P):A:GetInputTerm")
+	info(autosaveFields, "VAL UNSV COSV ZRSV ONSV TWSV")
+}
+
+record(mbbi, "$(P):A:GetInputTerm") {
+    field(DESC, "Get A Input Termination")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanInt(TERM,1) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(ZRST, "50 Ohm")
+    field(ONST, "1 MOhm")
+    field(TWST, "UHF Prescalers")
+	info(autosaveFields, "UNSV COSV ZRSV ONSV TWSV")
+}
+
+record(mbbo, "$(P):B:SetInputTerm") {
+    field(DESC, "Set B Input Termination")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeChanInt(TERM,2) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(ZRST, "50 Ohm")
+    field(ONST, "1 MOhm")
+    field(TWST, "UHF Prescalers")
+    field(FLNK, "$(P):B:GetInputTerm")
+	info(autosaveFields, "VAL UNSV COSV ZRSV ONSV TWSV")
+}
+
+record(mbbi, "$(P):B:GetInputTerm") {
+    field(DESC, "Get B Input Termination")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanInt(TERM,2) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(ZRST, "50 Ohm")
+    field(ONST, "1 MOhm")
+    field(TWST, "UHF Prescalers")
+	info(autosaveFields, "UNSV COSV ZRSV ONSV TWSV")
+}
+
+# Trigger Mode of A/B Inputs TMOD
+record(bo, "$(P):A:SetTrigMode") {
+    field(DESC, "Set A Trigger Mode")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeChanInt(TMOD,1) $(P)")
+    field(ZNAM, "NORMAL")
+    field(ONAM, "AUTOLEVEL")
+    field(FLNK, "$(P):A:GetTrigMode")
+	info(autosaveFields, "VAL ZSV OSV")
+}
+
+record(bi, "$(P):A:GetTrigMode") {
+    field(DESC, "Get A Trigger Mode")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanInt(TMOD,1) $(P)")
+    field(ZNAM, "NORMAL")
+    field(ONAM, "AUTOLEVEL")
+	info(autosaveFields, "ZSV OSV")
+}
+
+record(bo, "$(P):B:SetTrigMode") {
+    field(DESC, "Set B Trigger Mode")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeChanInt(TMOD,2) $(P)")
+    field(ZNAM, "NORMAL")
+    field(ONAM, "AUTOLEVEL")
+    field(FLNK, "$(P):B:GetTrigMode")
+	info(autosaveFields, "VAL ZSV OSV")
+}
+
+record(bi, "$(P):B:GetTrigMode") {
+    field(DESC, "Get B Trigger Mode")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanInt(TMOD,2) $(P)")
+    field(ZNAM, "NORMAL")
+    field(ONAM, "AUTOLEVEL")
+	info(autosaveFields, "VAL ZSV OSV")
+}
+
+# Trigger Slope of EXT/A/B Inputs TSLP
+record(bo, "$(P):EXT:SetTrigSlope") {
+    field(DESC, "Set EXT Trigger Slope")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeChanInt(TSLP,0) $(P)")
+    field(ZNAM, "POSITIVE")
+    field(ONAM, "NEGATIVE")
+    field(FLNK, "$(P):EXT:GetTrigSlope")
+	info(autosaveFields, "VAL ZSV OSV")
+}
+
+record(bi, "$(P):EXT:GetTrigSlope") {
+    field(DESC, "Get EXT Trigger Slope")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanInt(TSLP,0) $(P)")
+    field(ZNAM, "POSITIVE")
+    field(ONAM, "NEGATIVE")
+	info(autosaveFields, "ZSV OSV")
+}
+
+record(bo, "$(P):A:SetTrigSlope") {
+    field(DESC, "Set A Trigger Slope")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeChanInt(TSLP,1) $(P)")
+    field(ZNAM, "POSITIVE")
+    field(ONAM, "NEGATIVE")
+    field(FLNK, "$(P):A:GetTrigSlope")
+	info(autosaveFields, "VAL ZSV OSV")
+}
+
+record(bi, "$(P):A:GetTrigSlope") {
+    field(DESC, "Get A Trigger Slope")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanInt(TSLP,1) $(P)")
+    field(ZNAM, "POSITIVE")
+    field(ONAM, "NEGATIVE")
+	info(autosaveFields, "ZSV OSV")
+}
+
+record(bo, "$(P):B:SetTrigSlope") {
+    field(DESC, "Set B Trigger Slope")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeChanInt(TSLP,2) $(P)")
+    field(ZNAM, "POSITIVE")
+    field(ONAM, "NEGATIVE")
+    field(FLNK, "$(P):B:GetTrigSlope")
+	info(autosaveFields, "VAL ZSV OSV")
+}
+
+record(bi, "$(P):B:GetTrigSlope") {
+    field(DESC, "Get B Trigger Slope")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanInt(TSLP,2) $(P)")
+    field(ZNAM, "POSITIVE")
+    field(ONAM, "NEGATIVE")
+	info(autosaveFields, "ZSV OSV")
+}
+
+
+# Device trigger (same as pushing start button) *TRG
+record(bo, "$(P):DeviceTrigger") {
+    field(DESC, "Device trigger (START btn)")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeCmd(*TRG) $(P)")
+}
+
+# Start button STRT
+record(bo, "$(P):StartButton") {
+    field(DESC, "Push START button")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeCmd(STRT) $(P)")
+}
+
+# Stop button STOP
+record(bo, "$(P):StopButton") {
+    field(DESC, "Push STOP button")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeCmd(STOP) $(P)")
+}
+
+# Arming mode ARMM
+record(mbbi, "$(P):GetArmMode") {
+    field(DESC, "Get current arming mode")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(ARMM) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(THVL, "3")
+    field(FRVL, "4")
+    field(FVVL, "5")
+    field(SXVL, "6")
+    field(SVVL, "7")
+    field(EIVL, "8")
+    field(NIVL, "9")
+    field(TEVL, "10")
+    field(ELVL, "11")
+    field(TVVL, "12")
+    field(ZRST, "+-time")
+    field(ONST, "+ time")
+    field(TWST, "1 period")
+    field(THST, "0.01 s gate")
+    field(FRST, "0.1 s gate")
+    field(FVST, "1.0 s gate")
+    field(SXST, "ext trg += time")
+    field(SVST, "ext trig + time")
+    field(EIST, "ext gate/trg HO")
+    field(NIST, "ext 1period")
+    field(TEST, "ext 0.01 s gate")
+    field(ELST, "ext 0.1 s gate")
+    field(TVST, "ext 1.0 s gate")
+	info(autosaveFields, "UNSV COSV ZRSV ONSV TWSV THSV FRSV FVSV SXSV SVSV EISV NISV TESV ELSV TVSV")
+}
+
+record(mbbo, "$(P):SetArmMode") {
+    field(DESC, "Set current arming mode")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(ARMM) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(THVL, "3")
+    field(FRVL, "4")
+    field(FVVL, "5")
+    field(SXVL, "6")
+    field(SVVL, "7")
+    field(EIVL, "8")
+    field(NIVL, "9")
+    field(TEVL, "10")
+    field(ELVL, "11")
+    field(TVVL, "12")
+    field(ZRST, "+-time")
+    field(ONST, "+ time")
+    field(TWST, "1 period")
+    field(THST, "0.01 s gate")
+    field(FRST, "0.1 s gate")
+    field(FVST, "1.0 s gate")
+    field(SXST, "ext trg += time")
+    field(SVST, "ext trig + time")
+    field(EIST, "ext gate/trg HO")
+    field(NIST, "ext 1period")
+    field(TEST, "ext 0.01 s gate")
+    field(ELST, "ext 0.1 s gate")
+    field(TVST, "ext 1.0 s gate")
+    field(FLNK, "$(P):GetArmMode")
+	info(autosaveFields, "VAL UNSV COSV ZRSV ONSV TWSV THSV FRSV FVSV SXSV SVSV EISV NISV TESV ELSV TVSV")
+}
+
+# Autostart of Measurements AUTM
+record(bi, "$(P):GetAutoMeasMode") {
+    field(DESC, "Get auto measurement mode")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(AUTM) $(P)")
+    field(ZNAM, "OFF")
+    field(ONAM, "ON")
+	info(autosaveFields, "ZSV OSV")
+}
+
+record(bo, "$(P):SetAutoMeasMode") {
+    field(DESC, "Set auto measurement mode")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(AUTM) $(P)")
+    field(ZNAM, "OFF")
+    field(ONAM, "ON")
+    field(FLNK, "$(P):GetAutoMeasMode")
+	info(autosaveFields, "VAL ZSV OSV")
+}
+
+# Toggle complements parity in +-time arming COMP
+# Oddly, this command changes a setting with no readback ability
+record(bo, "$(P):CompParity") {
+    field(DESC, "Toggle complements parity")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeCmd(COMP) $(P)")
+	info(autosaveFields, "VAL ZSV OSV")
+}
+
+# Display REL setting DREL
+record(mbbi, "$(P):GetDispRELMode") {
+    field(DESC, "Get display REL mode")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(DREL) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(THVL, "3")
+    field(ZRST, "clear")
+    field(ONST, "set")
+    field(TWST, "clr REL & disp")
+    field(THST, "REL=cursor pos")
+	info(autosaveFields, "UNSV COSV ZRSV ONSV TWSV THSV")
+}
+
+record(mbbo, "$(P):SetDispRELMode") {
+    field(DESC, "Set display REL mode")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(DREL) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(THVL, "3")
+    field(ZRST, "clear")
+    field(ONST, "set")
+    field(TWST, "clr REL & disp")
+    field(THST, "REL=cursor pos")
+    field(FLNK, "$(P):GetDispRELMode")
+	info(autosaveFields, "VAL UNSV COSV ZRSV ONSV TWSV THSV")
+}
+
+# Period of count gate GATE
+# This will only accept specific values:
+# "x may be between 1us and 500s in a 1,2,5 sequence. if x<0 an externally
+#  triggered gate of length x is set."
+# SR620 only replies if measurement Mode is PERIOD or COUNT.
+record(ai, "$(P):GetGatePeriod") {
+    field(DESC, "Get count gate period [s]")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readFloat(GATE) $(P)")
+    field(EGU,  "s")
+	field(PINI, "YES")
+	info(autosaveFields, "HHSV HSV LSV LLSV HIHI HIGH LOW LOLO")
+}
+
+record(calcout, "$(P):GetGatePeriod:Update") {
+	field( DESC, "Ck if we can query" )
+	field( INPA, "$(P):GetInstrumentMode NPP" )
+	field( CALC, "A==4||A==6" )
+	field( OOPT, "When Non-zero" )
+	field( OUT,  "$(P):GetGatePeriod.PROC PP NMS" )
+}
+
+record(ao, "$(P):SetGatePeriod") {
+    field(DESC, "Set count gate period [s]")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeFloat(GATE) $(P)")
+    field(DRVH, "500")
+    field(DRVL, "0.000001")
+    field(EGU,  "s")
+    field(FLNK, "$(P):GetGatePeriod:Update")
+	info(autosaveFields, "VAL HHSV HSV LSV LLSV HIHI HIGH LOW LOLO")
+}
+
+# Variance type (jitter calculation)  JTTR
+record(bi, "$(P):GetVarianceType") {
+    field(DESC, "Get var type (jitter calc)")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(JTTR) $(P)")
+    field(ZNAM, "std dev")
+    field(ONAM, "Allan variance")
+	info(autosaveFields, "ZSV OSV")
+}
+
+record(bo, "$(P):SetVarianceType") {
+    field(DESC, "Set var type (jitter calc)")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(JTTR) $(P)")
+    field(ZNAM, "std dev")
+    field(ONAM, "Allan variance")
+    field(FLNK, "$(P):GetVarianceType")
+	info(autosaveFields, "VAL ZSV OSV")
+}
+
+# Instrument mode MODE
+record(mbbi, "$(P):GetInstrumentMode") {
+    field(DESC, "Get instrument mode")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(MODE) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(THVL, "3")
+    field(FRVL, "4")
+    field(FVVL, "5")
+    field(SXVL, "6")
+    field(ZRST, "TIME")
+    field(ONST, "WIDTH")
+    field(TWST, "TR/TF")
+    field(THST, "FREQ")
+    field(FRST, "PERIOD")
+    field(FVST, "PHASE")
+    field(SXST, "COUNT")
+	info(autosaveFields, "UNSV COSV ZRSV ONSV TWSV THSV FRSV FVSV SXSV")
+}
+
+record(mbbo, "$(P):SetInstrumentMode") {
+    field(DESC, "Set instrument mode")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(MODE) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(THVL, "3")
+    field(FRVL, "4")
+    field(FVVL, "5")
+    field(SXVL, "6")
+    field(ZRST, "TIME")
+    field(ONST, "WIDTH")
+    field(TWST, "TR/TF")
+    field(THST, "FREQ")
+    field(FRST, "PERIOD")
+    field(FVST, "PHASE")
+    field(SXST, "COUNT")
+    field(FLNK, "$(P):GetInstrumentMode")
+	info(autosaveFields, "VAL UNSV COSV ZRSV ONSV TWSV THSV FRSV FVSV SXSV")
+}
+
+# Number of samples in a measurement SIZE
+# This will only accept specific values:
+# "The parameter x may be between 1 and 10^6 in a 1,2,5 sequence."
+record(ai, "$(P):GetSampleSize") {
+    field(DESC, "Get sample size (count)")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readFloat(SIZE) $(P)")
+	info(autosaveFields, "HHSV HSV LSV LLSV HIHI HIGH LOW LOLO")
+}
+
+record(ao, "$(P):SetSampleSize") {
+    field(DESC, "Set sample size (count)")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeFloat(SIZE) $(P)")
+    field(DRVH, "1000000")
+    field(DRVL, "1")
+    field(FLNK, "$(P):GetSampleSize")
+	info(autosaveFields, "VAL HHSV HSV LSV LLSV HIHI HIGH LOW LOLO")
+}
+
+# Measurement source setting SRCE
+record(mbbi, "$(P):GetMeasSource") {
+    field(DESC, "Get measurement source")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(SRCE) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(THVL, "3")
+    field(ZRST, "A")
+    field(ONST, "B")
+    field(TWST, "REF")
+    field(THST, "ratio")
+	info(autosaveFields, "UNSV COSV ZRSV ONSV TWSV THSV")
+}
+
+record(mbbo, "$(P):SetMeasSource") {
+    field(DESC, "Set measurement source")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(SRCE) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(THVL, "3")
+    field(ZRST, "A")
+    field(ONST, "B")
+    field(TWST, "REF")
+    field(THST, "ratio")
+    field(FLNK, "$(P):GetMeasSource")
+	info(autosaveFields, "VAL UNSV COSV ZRSV ONSV TWSV THSV")
+}
+
+
+# Start a measurement and return the result MEAS
+# Four different kinds of gets, split up just like channels
+record(ai, "$(P):StartMeasGetMean") {
+    field(DESC, "Start meas., get mean")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanFloat(MEAS,0) $(P)")
+	info(autosaveFields, "HHSV HSV LSV LLSV HIHI HIGH LOW LOLO")
+}
+
+record(ai, "$(P):StartMeasGetJitter") {
+    field(DESC, "Start meas., get jitter")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanFloat(MEAS,1) $(P)")
+	info(autosaveFields, "HHSV HSV LSV LLSV HIHI HIGH LOW LOLO")
+}
+
+record(ai, "$(P):StartMeasGetMax") {
+    field(DESC, "Start meas., get max")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanFloat(MEAS,2) $(P)")
+	info(autosaveFields, "HHSV HSV LSV LLSV HIHI HIGH LOW LOLO")
+}
+
+record(ai, "$(P):StartMeasGetMin") {
+    field(DESC, "Start meas., get min")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanFloat(MEAS,3) $(P)")
+	info(autosaveFields, "HHSV HSV LSV LLSV HIHI HIGH LOW LOLO")
+}
+
+
+# Start a measurement using MEAS
+# This is probably the better record to use, because it is an output record
+# and doesn't realy on setting PROC to 1 to process
+record(bo, "$(P):StartMeasurement") {
+    field(DESC, "Start measurement")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeCmd(MEAS?) $(P)")
+    field(FLNK, "$(P):ProcMeasAll")
+}
+
+# TODO record that StartMeasurement FLNKs to that grabs all of the resulting
+# data using XALL? and shoves it into the correct records
+record(fanout, "$(P):ProcMeasAll") {
+    field(DESC, "Process all measurements")
+    field(LNK1, "$(P):GetMeasMean")
+    field(LNK2, "$(P):GetMeasJitter")
+    field(LNK3, "$(P):GetMeasMax")
+    field(LNK4, "$(P):GetMeasMin")
+}
+
+# Average (mean) of the last measurement XAVG
+record(ai, "$(P):GetMeasMean") {
+    field(DESC, "Last measurement mean")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readFloat(XAVG) $(P)")
+    field(LSV,  "MINOR")
+    field(HSV,  "MINOR")
+    field(EGU,  "s")
+    field(PREC, "12")
+    field(FLNK, "$(P):GetOffsetInvMeasMean")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(calcout, "$(P):GetMeasMean_nscalc") {
+	field( DESC, "Measured mean in ns" )
+	field( INPA, "$(P):GetMeasMean CPP MS" )
+	field( CALC, "A*1e9" )
+	field( OUT,  "$(P):GetMeasMean_ns PP MS" )
+}
+record(ai, "$(P):GetMeasMean_ns") {
+    field(DESC, "Last measurement mean")
+    field(EGU,  "ns")
+    field(PREC, "6")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+# Jitter of the last measurement XJIT
+record(ai, "$(P):GetMeasJitter") {
+    field(DESC, "Last measurement jitter")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readFloat(XJIT) $(P)")
+    field(LSV,  "MINOR")
+    field(HSV,  "MINOR")
+    field(EGU,  "s")
+    field(PREC, "12")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(calcout, "$(P):GetMeasJitter_nscalc") {
+	field( DESC, "Measured jitter in ns" )
+	field( INPA, "$(P):GetMeasJitter CPP MS" )
+	field( CALC, "A*1e9" )
+	field( OUT,  "$(P):GetMeasJitter_ns PP MS" )
+}
+record(ai, "$(P):GetMeasJitter_ns") {
+    field(DESC, "Last measurement jitter")
+    field(EGU,  "ns")
+    field(PREC, "6")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+# Max of the last measurement XMAX
+record(ai, "$(P):GetMeasMax") {
+    field(DESC, "Last measurement maximum")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readFloat(XMAX) $(P)")
+    field(LSV,  "MINOR")
+    field(HSV,  "MINOR")
+    field(EGU,  "s")
+    field(PREC, "12")
+    field(FLNK, "$(P):GetOffsetInvMeasMax")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(calcout, "$(P):GetMeasMax_nscalc") {
+	field( DESC, "Measured Max in ns" )
+	field( INPA, "$(P):GetMeasMax CPP MS" )
+	field( CALC, "A*1e9" )
+	field( OUT,  "$(P):GetMeasMax_ns PP MS" )
+}
+record(ai, "$(P):GetMeasMax_ns") {
+    field(DESC, "Last measurement maximum")
+    field(EGU,  "ns")
+    field(PREC, "6")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+# Min of the last measurement XMIN
+record(ai, "$(P):GetMeasMin") {
+    field(DESC, "Last measurement minimum")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readFloat(XMIN) $(P)")
+    field(LSV,  "MINOR")
+    field(HSV,  "MINOR")
+    field(EGU,  "s")
+    field(PREC, "12")
+    field(FLNK, "$(P):GetOffsetInvMeasMin")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(calcout, "$(P):GetMeasMin_nscalc") {
+	field( DESC, "Measured Min in ns" )
+	field( INPA, "$(P):GetMeasMin CPP MS" )
+	field( CALC, "A*1e9" )
+	field( OUT,  "$(P):GetMeasMin_ns PP MS" )
+}
+record(ai, "$(P):GetMeasMin_ns") {
+    field(DESC, "Last measurement minimum")
+    field(EGU,  "ns")
+    field(PREC, "6")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+# Value of display rel XREL
+record(ai, "$(P):GetDispREL") {
+    field(DESC, "Get display REL")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readFloat(XREL) $(P)")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(ao, "$(P):SetDispREL") {
+    field(DESC, "Set display REL")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeFloat(XREL) $(P)")
+    field(FLNK, "$(P):GetDispREL")
+	info(autosaveFields, "VAL DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+
+# DAC output mode of mean and jitter DACs ANMD
+record(mbbi, "$(P):GetDACOutputMode") {
+    field(DESC, "Get rear DAC output mode")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(ANMD) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(THVL, "3")
+    field(ZRST, "chart/chart")
+    field(ONST, "DAC/chart")
+    field(TWST, "chart/DAC")
+    field(THST, "DAC/DAC")
+	info(autosaveFields, "UNSV COSV ZRSV ONSV TWSV THSV")
+}
+
+record(mbbo, "$(P):SetDACOutputMode") {
+    field(DESC, "Set rear DAC output mode")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(ANMD) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(THVL, "3")
+    field(ZRST, "chart/chart")
+    field(ONST, "DAC/chart")
+    field(TWST, "chart/DAC")
+    field(THST, "DAC/DAC")
+    field(FLNK, "$(P):GetDACOutputMode")
+	info(autosaveFields, "VAL UNSV COSV ZRSV ONSV TWSV THSV")
+}
+
+# Start position of internal delay scan DBEG
+record(ai, "$(P):GetDelayStartPos") {
+    field(DESC, "Get int. delay start pos.")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(DBEG) $(P)")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(ao, "$(P):SetDelayStartPos") {
+    field(DESC, "Set int. delay start pos.")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(DBEG) $(P)")
+    field(DRVH, "50000")
+    field(DRVL, "1")
+    field(FLNK, "$(P):GetDelayStartPos")
+	info(autosaveFields, "VAL DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+# Internal delay scan mode DSEN
+record(mbbi, "$(P):GetDelayScanMode") {
+    field(DESC, "Get internal delay mode")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(DSEN) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(ZRST, "DELAY OFF")
+    field(ONST, "DELAY HOLD")
+    field(TWST, "DELAY SCAN")
+	info(autosaveFields, "UNSV COSV ZRSV ONSV TWSV")
+}
+
+record(mbbo, "$(P):SetDelayScanMode") {
+    field(DESC, "Set internal delay mode")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(DSEN) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(ZRST, "DELAY OFF")
+    field(ONST, "DELAY HOLD")
+    field(TWST, "DELAY SCAN")
+    field(FLNK, "$(P):GetDelayScanMode")
+	info(autosaveFields, "VAL UNSV COSV ZRSV ONSV TWSV")
+}
+
+# Internal delay scan step size DSTP
+# "The range of sizes that may be set is between 1us and 10ms in a 1,2,5 seq"
+record(ai, "$(P):GetDelayScanStepSize") {
+    field(DESC, "Get int delay scan step size")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readFloat(DSTP) $(P)")
+    field(EGU,  "s")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(ao, "$(P):SetDelayScanStepSize") {
+    field(DESC, "Set int delay scan step size")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeFloat(DSTP) $(P)")
+    field(DRVH, "0.01")
+    field(DRVL, "0.000001")
+    field(EGU,  "s")
+    field(FLNK, "$(P):GetDelayScanStepSize")
+	info(autosaveFields, "VAL DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+# Hold time between scan points when in scan mode HOLD
+# "from .01s to 1000s in .01s steps"
+record(ai, "$(P):GetScanHoldTime") {
+    field(DESC, "Get hold time btn scan pts")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readFloat(HOLD) $(P)")
+	info(autosaveFields, "VAL DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(ao, "$(P):SetScanHoldTime") {
+    field(DESC, "Set hold time btn scan pts")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeFloat(HOLD) $(P)")
+    field(DRVH, "1000")
+    field(DRVL, "0.01")
+    field(FLNK, "$(P):GetScanHoldTime")
+	info(autosaveFields, "VAL DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+# Clear and start a scan SCAN
+record(bo, "$(P):StartScan") {
+    field(DESC, "Clear and start a scan")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeCmd(SCAN) $(P)")
+	info(autosaveFields, "ZSV OSV")
+}
+
+# Clear, but not start, a scan SCLR
+record(bo, "$(P):ClearScan") {
+    field(DESC, "Clear but not start a scan")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeCmd(SCLR) $(P)")
+	info(autosaveFields, "ZSV OSV")
+}
+
+# Enable/disable scanning SCEN
+record(mbbi, "$(P):GetScanMode") {
+    field(DESC, "Get scanning mode")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(SCEN) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(ZRST, "DISABLED")
+    field(ONST, "SINGLE SCAN")
+    field(TWST, "REPEAT SCAN")
+	info(autosaveFields, "UNSV COSV ZRSV ONSV TWSV")
+}
+
+record(mbbo, "$(P):SetScanMode") {
+    field(DESC, "Set scanning mode")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(SCEN) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(ZRST, "DISABLED")
+    field(ONST, "SINGLE SCAN")
+    field(TWST, "REPEAT SCAN")
+    field(FLNK, "$(P):GetScanMode")
+	info(autosaveFields, "VAL UNSV COSV ZRSV ONSV TWSV")
+}
+
+# Number of the last completed scan point SLOC
+record(ai, "$(P):GetLastScanPoint") {
+    field(DESC, "Get # of last scan point")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(SLOC) $(P)")
+}
+
+# Number of scan points SCPT
+# Legal values are 2,5,10,25,50,125,250
+record(mbbi, "$(P):GetNumScanPoints") {
+    field(DESC, "Get # of scan points")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(SCPT) $(P)")
+    field(ZRVL, "2")
+    field(ONVL, "5")
+    field(TWVL, "10")
+    field(THVL, "25")
+    field(FRVL, "50")
+    field(FVVL, "125")
+    field(SXVL, "250")
+    field(ZRST, "2")
+    field(ONST, "5")
+    field(TWST, "10")
+    field(THST, "25")
+    field(FRST, "50")
+    field(FVST, "125")
+    field(SXST, "250")
+	info(autosaveFields, "UNSV COSV ZRSV ONSV TWSV THSV FRSV FVSV SXSV")
+}
+
+record(mbbo, "$(P):SetNumScanPoints") {
+    field(DESC, "Set # of scan points")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(SCPT) $(P)")
+    field(ZRVL, "2")
+    field(ONVL, "5")
+    field(TWVL, "10")
+    field(THVL, "25")
+    field(FRVL, "50")
+    field(FVVL, "125")
+    field(SXVL, "250")
+    field(ZRST, "2")
+    field(ONST, "5")
+    field(TWST, "10")
+    field(THST, "25")
+    field(FRST, "50")
+    field(FVST, "125")
+    field(SXST, "250")
+    field(FLNK, "$(P):GetNumScanPoints")
+	info(autosaveFields, "VAL UNSV COSV ZRSV ONSV TWSV THSV FRSV FVSV SXSV")
+}
+
+# DAC output scan starting voltage VBEG
+record(ai, "$(P):DAC0:GetScanStartV") {
+    field(DESC, "Get DAC0 out scan starting V")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanFloat(VBEG,0) $(P)")
+    field(PREC, "2")
+    field(EGU,  "V")
+	info(autosaveFields, "HHSV HSV LSV LLSV HIHI HIGH LOW LOLO")
+}
+
+record(ai, "$(P):DAC1:GetScanStartV") {
+    field(DESC, "Get DAC1 out scan starting V")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanFloat(VBEG,1) $(P)")
+    field(PREC, "2")
+    field(EGU,  "V")
+	info(autosaveFields, "HHSV HSV LSV LLSV HIHI HIGH LOW LOLO")
+}
+
+record(ao, "$(P):DAC0:SetScanStartV") {
+    field(DESC, "Set DAC0 out scan starting V")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeChanFloat(VBEG,0) $(P)")
+    field(DRVH, "10")
+    field(DRVL, "-10")
+    field(PREC, "2")
+    field(EGU,  "V")
+    field(FLNK, "$(P):DAC0:GetScanStartV")
+	info(autosaveFields, "VAL HHSV HSV LSV LLSV HIHI HIGH LOW LOLO")
+}
+
+record(ao, "$(P):DAC1:SetScanStartV") {
+    field(DESC, "Set DAC1 out scan starting V")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeChanFloat(VBEG,1) $(P)")
+    field(DRVH, "10")
+    field(DRVL, "-10")
+    field(PREC, "2")
+    field(EGU,  "V")
+    field(FLNK, "$(P):DAC1:GetScanStartV")
+	info(autosaveFields, "VAL HHSV HSV LSV LLSV HIHI HIGH LOW LOLO")
+}
+
+# Current DAC output voltage VOUT
+record(ai, "$(P):DAC0:GetOutputV") {
+    field(DESC, "Get DAC0 current output V")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanFloat(VOUT,0) $(P)")
+    field(PREC, "2")
+    field(EGU,  "V")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(ai, "$(P):DAC1:GetOutputV") {
+    field(DESC, "Get DAC1 current output V")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanFloat(VOUT,1) $(P)")
+    field(PREC, "2")
+    field(EGU,  "V")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+# DAC scan step size [V] VSTP
+record(ai, "$(P):DAC0:GetScanStepSize") {
+    field(DESC, "Get DAC0 scan step size [V]")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanFloat(VSTP,0) $(P)")
+    field(PREC, "2")
+    field(EGU,  "V")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(ai, "$(P):DAC1:GetScanStepSize") {
+    field(DESC, "Get DAC1 scan step size [V]")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanFloat(VSTP,1) $(P)")
+    field(PREC, "2")
+    field(EGU,  "V")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(ao, "$(P):DAC0:SetScanStepSize") {
+    field(DESC, "Set DAC0 scan step size [V]")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto readChanFloat(VSTP,0) $(P)")
+    field(PREC, "2")
+    field(EGU,  "V")
+    field(FLNK, "$(P):DAC0:GetScanStepSize")
+	info(autosaveFields, "VAL DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(ao, "$(P):DAC1:SetScanStepSize") {
+    field(DESC, "Set DAC1 scan step size [V]")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto readChanFloat(VSTP,1) $(P)")
+    field(PREC, "2")
+    field(EGU,  "V")
+    field(FLNK, "$(P):DAC1:GetScanStepSize")
+	info(autosaveFields, "VAL DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+
+# Autoprint mode AUTP
+record(bi, "$(P):GetAutoprintMode") {
+    field(DESC, "Get autoprint mode")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(AUTP) $(P)")
+    field(ZNAM, "OFF")
+    field(ONAM, "ON")
+	info(autosaveFields, "ZSV OSV")
+}
+
+record(bo, "$(P):SetAutoprintMode") {
+    field(DESC, "Set autoprint mode")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(AUTP) $(P)")
+    field(ZNAM, "OFF")
+    field(ONAM, "ON")
+    field(FLNK, "$(P):GetAutoprintMode")
+	info(autosaveFields, "VAL ZSV OSV")
+}
+
+# Autoscale the displayed graph AUTS
+record(bo, "$(P):AutoscaleGraph") {
+    field(DESC, "Autoscale displayed graph")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeCmd(AUTS) $(P)")
+}
+
+# Cursor position CURS
+# Excluded from periodic UpdateAll
+record(ai, "$(P):GetCursorPosition") {
+    field(DESC, "Get current cursor position")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(CURS) $(P)")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(ao, "$(P):SetCursorPosition") {
+    field(DESC, "Set current cursor position")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(CURS) $(P)")
+    field(DRVH, "250")
+    field(DRVL, "1")
+    field(FLNK, "$(P):GetCursorPosition")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+# Displayed graph type DGPH
+record(mbbi, "$(P):GetDisplayGraphType") {
+    field(DESC, "Get displayed graph type")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(DGPH) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(ZRST, "HISTOGRAM")
+    field(ONST, "MEAN")
+    field(TWST, "JITTER")
+	info(autosaveFields, "UNSV COSV ZRSV ONSV TWSV")
+}
+
+record(mbbo, "$(P):SetDisplayGraphType") {
+    field(DESC, "Set displayed graph type")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(DGPH) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(ZRST, "HISTOGRAM")
+    field(ONST, "MEAN")
+    field(TWST, "JITTER")
+    field(FLNK, "$(P):GetDisplayGraphType")
+	info(autosaveFields, "VAL UNSV COSV ZRSV ONSV TWSV")
+}
+
+# Clear the displayed graph GCLR
+record(bo, "$(P):ClearDisplayGraph") {
+    field(DESC, "Clear the displayed graph")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeCmd(GCLR) $(P)")
+}
+
+# Enable/disable graphs GENA
+record(bi, "$(P):GetGraphEnable") {
+    field(DESC, "Get graph enable status")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(GENA) $(P)")
+    field(ZNAM, "OFF")
+    field(ONAM, "ON")
+	info(autosaveFields, "ZSV OSV")
+}
+
+record(bo, "$(P):SetGraphEnable") {
+    field(DESC, "Set graph enable status")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(GENA) $(P)")
+    field(ZNAM, "OFF")
+    field(ONAM, "ON")
+    field(FLNK, "$(P):GetGraphEnable")
+	info(autosaveFields, "VAL ZSV OSV")
+}
+
+# Graph scale settings GSCL
+# One record per setting, even though they all use the same 4-letter command
+record(ai, "$(P):GetGraphScaleHistV") {
+    field(DESC, "Get histogram vertical scale")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanFloat(GSCL,0) $(P)")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(ai, "$(P):GetGraphScaleHistH") {
+    field(DESC, "Get histogram horiz scale")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanFloat(GSCL,1) $(P)")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(ai, "$(P):GetGraphScaleHistB") {
+    field(DESC, "Get histogram # bins")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanFloat(GSCL,2) $(P)")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(ai, "$(P):GetGraphScaleMean") {
+    field(DESC, "Get mean graph scale")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanFloat(GSCL,3) $(P)")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(ai, "$(P):GetGraphScaleJitter") {
+    field(DESC, "Get jitter graph scale")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanFloat(GSCL,4) $(P)")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(ao, "$(P):SetGraphScaleHistV") {
+    field(DESC, "Set histogram vertical scale")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeChanFloat(GSCL,0) $(P)")
+    field(FLNK, "$(P):GetGraphScaleHistV")
+	info(autosaveFields, "VAL DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(ao, "$(P):SetGraphScaleHistH") {
+    field(DESC, "Set histogram horiz scale")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeChanFloat(GSCL,1) $(P)")
+    field(FLNK, "$(P):GetGraphScaleHistH")
+	info(autosaveFields, "VAL DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(ao, "$(P):SetGraphScaleHistB") {
+    field(DESC, "Set histogram # bins")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeChanFloat(GSCL,2) $(P)")
+    field(FLNK, "$(P):GetGraphScaleHistB")
+	info(autosaveFields, "VAL DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(ao, "$(P):SetGraphScaleMean") {
+    field(DESC, "Set mean graph scale")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeChanFloat(GSCL,3) $(P)")
+    field(FLNK, "$(P):GetGraphScaleMean")
+	info(autosaveFields, "VAL DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(ao, "$(P):SetGraphScaleJitter") {
+    field(DESC, "Set jitter graph scale")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeChanFloat(GSCL,4) $(P)")
+    field(FLNK, "$(P):GetGraphScaleJitter")
+	info(autosaveFields, "VAL DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+# Output device PDEV
+record(bi, "$(P):GetPrintingDevice") {
+    field(DESC, "Get current printing device")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(PDEV) $(P)")
+    field(ZNAM, "PRINTER")
+    field(ONAM, "PLOTTER")
+	info(autosaveFields, "ZSV OSV")
+}
+
+record(bo, "$(P):SetPrintingDevice") {
+    field(DESC, "Set current printing device")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(PDEV) $(P)")
+    field(ZNAM, "PRINTER")
+    field(ONAM, "PLOTTER")
+    field(FLNK, "$(P):GetPrintingDevice")
+	info(autosaveFields, "VAL ZSV OSV")
+}
+
+# Plotter GPIB address PLAD
+record(ai, "$(P):GetPlotterAddress") {
+    field(DESC, "Get plotter GPIB address")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(PLAD) $(P)")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(ao, "$(P):SetPlotterAddress") {
+    field(DESC, "Set plotter GPIB address")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(PLAD) $(P)")
+    field(DRVH, "30")
+    field(DRVL, "1")
+	info(autosaveFields, "VAL DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+# Plotter port setting PLPT
+record(bi, "$(P):GetPlotterPort") {
+    field(DESC, "Get plotter port RS232/GPIB")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(PLPT) $(P)")
+    field(ZNAM, "RS-232")
+    field(ONAM, "GPIB")
+	info(autosaveFields, "ZSV OSV")
+}
+
+record(bo, "$(P):SetPlotterPort") {
+    field(DESC, "Set plotter port RS232/GPIB")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(PLPT) $(P)")
+    field(ZNAM, "RS-232")
+    field(ONAM, "GPIB")
+    field(FLNK, "$(P):GetPlotterPort")
+	info(autosaveFields, "VAL ZSV OSV")
+}
+
+# Initiate a plot or print PLOT
+record(bo, "$(P):StartPlot") {
+    field(DESC, "Initiate a plot/print")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeCmd(PLOT) $(P)")
+}
+
+# Clear any plots or prints in progress PCLR
+record(bo, "$(P):ClearPlot") {
+    field(DESC, "Clear any plots/prints")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeCmd(PCLR) $(P)")
+}
+
+# Display source setting DISP
+record(mbbi, "$(P):GetDisplaySource") {
+    field(DESC, "Get current display source")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(DISP) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(THVL, "3")
+    field(FRVL, "4")
+    field(FVVL, "5")
+    field(SXVL, "6")
+    field(ZRST, "MEAN VALUE")
+    field(ONST, "REL VALUE")
+    field(TWST, "JITTER")
+    field(THST, "MAX VALUE")
+    field(FRST, "MIN VALUE")
+    field(FVST, "TRIG THRESH")
+    field(SXST, "DVM INPUTS")
+	info(autosaveFields, "UNSV COSV ZRSV ONSV TWSV THSV FRSV FVSV SXSV")
+}
+
+record(mbbo, "$(P):SetDisplaySource") {
+    field(DESC, "Set display source")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(DISP) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(THVL, "3")
+    field(FRVL, "4")
+    field(FVVL, "5")
+    field(SXVL, "6")
+    field(ZRST, "MEAN VALUE")
+    field(ONST, "REL VALUE")
+    field(TWST, "JITTER")
+    field(THST, "MAX VALUE")
+    field(FRST, "MIN VALUE")
+    field(FVST, "TRIG THRESH")
+    field(SXST, "DVM INPUTS")
+    field(FLNK, "$(P):GetDisplaySource")
+	info(autosaveFields, "VAL UNSV COSV ZRSV ONSV TWSV THSV FRSV FVSV SXSV")
+}
+
+# Set the x1000 expand mode in freq/per modes EXPD
+record(bi, "$(P):GetExpandMode") {
+    field(DESC, "Get x1000 expand mode")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(EXPD) $(P)")
+    field(ZNAM, "OFF")
+    field(ONAM, "ON")
+	info(autosaveFields, "ZSV OSV")
+}
+
+record(bo, "$(P):SetExpandMode") {
+    field(DESC, "Set x1000 expand mode")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(EXPD) $(P)")
+    field(ZNAM, "OFF")
+    field(ONAM, "ON")
+    field(FLNK, "$(P):GetExpandMode")
+	info(autosaveFields, "VAL ZSV OSV")
+}
+
+# Keypress simulation KEYS
+# Only specific keycodes are permitted. See manual.
+record(ai, "$(P):GetLastKeyPressed") {
+    field(DESC, "Get last key pressed")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(KEYS) $(P)")
+}
+
+record(ao, "$(P):SendKeyPress") {
+    field(DESC, "Send key press (keycode)")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(KEYS) $(P)")
+    field(FLNK, "$(P):GetLastKeyPressed")
+}
+
+# Clock source setting CLCK
+record(bi, "$(P):GetClockSource") {
+    field(DESC, "Get current clock source")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(CLCK) $(P)")
+    field(ZNAM, "INTERNAL")
+    field(ONAM, "EXTERNAL")
+	info(autosaveFields, "ZSV OSV")
+}
+
+record(bo, "$(P):SetClockSource") {
+    field(DESC, "Set current clock source")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(CLCK) $(P)")
+    field(ZNAM, "INTERNAL")
+    field(ONAM, "EXTERNAL")
+    field(FLNK, "$(P):GetClockSource")
+	info(autosaveFields, "VAL ZSV OSV")
+}
+
+# External clock frequency setting CLKF
+record(bi, "$(P):GetClockFreq") {
+    field(DESC, "Get external clock freq")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(CLKF) $(P)")
+    field(ZNAM, "10 MHz")
+    field(ONAM, "5 MHz")
+	info(autosaveFields, "ZSV OSV")
+}
+
+record(bo, "$(P):SetClockFreq") {
+    field(DESC, "Set external clock freq")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(CLKF) $(P)")
+    field(ZNAM, "10 MHz")
+    field(ONAM, "5 MHz")
+    field(FLNK, "$(P):GetClockFreq")
+	info(autosaveFields, "VAL ZSV OSV")
+}
+
+# Binary I/O port read/write PORT
+# No readback and not keyed to periodic update
+record(ai, "$(P):GetPortByte") {
+    field(DESC, "Get byte from bin I/O")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(PORT) $(P)")
+}
+
+record(ao, "$(P):SetPortByte") {
+    field(DESC, "Send byte to bin I/O")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(PORT) $(P)")
+    field(DRVH, "255")
+    field(DRVL, "0")
+}
+
+# Printer port mode PRTM
+record(mbbi, "$(P):GetPrinterPortMode") {
+    field(DESC, "Get current printer pt mode")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(PRTM) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(ZRST, "PRINT")
+    field(ONST, "INPUT")
+    field(TWST, "OUTPUT")
+	info(autosaveFields, "UNSV COSV ZRSV ONSV TWSV")
+}
+
+record(mbbo, "$(P):SetPrinterPortMode") {
+    field(DESC, "Set current printer pt mode")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeInt(PRTM) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(ZRST, "PRINT")
+    field(ONST, "INPUT")
+    field(TWST, "OUTPUT")
+    field(FLNK, "$(P):GetPrinterPortMode")
+	info(autosaveFields, "VAL UNSV COSV ZRSV ONSV TWSV")
+}
+
+# DVM input full scale volage RNGE
+record(mbbi, "$(P):DVM0:GetVRange") {
+    field(DESC, "Get DVM0 full voltage range")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanInt(RNGE,0) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(ZRST, "autorange")
+    field(ONST, "+-20 V")
+    field(TWST, "+-2 V")
+	info(autosaveFields, "UNSV COSV ZRSV ONSV TWSV")
+}
+
+record(mbbi, "$(P):DVM1:GetVRange") {
+    field(DESC, "Get DVM1 full voltage range")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanInt(RNGE,1) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(ZRST, "autorange")
+    field(ONST, "+-20 V")
+    field(TWST, "+-2 V")
+	info(autosaveFields, "UNSV COSV ZRSV ONSV TWSV")
+}
+
+record(mbbo, "$(P):DVM0:SetVRange") {
+    field(DESC, "Set DVM0 full voltage range")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeChanInt(RNGE,0) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(ZRST, "autorange")
+    field(ONST, "+-20 V")
+    field(TWST, "+-2 V")
+    field(FLNK, "$(P):DVM0:GetVRange")
+	info(autosaveFields, "VAL UNSV COSV ZRSV ONSV TWSV")
+}
+
+record(mbbo, "$(P):DVM1:SetVRange") {
+    field(DESC, "Set DVM1 full voltage range")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeChanInt(RNGE,1) $(P)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(ZRST, "autorange")
+    field(ONST, "+-20 V")
+    field(TWST, "+-2 V")
+    field(FLNK, "$(P):DVM1:GetVRange")
+	info(autosaveFields, "VAL UNSV COSV ZRSV ONSV TWSV")
+}
+
+# Read voltage from DVM channels VOLT
+record(ai, "$(P):DVM0:GetV") {
+    field(DESC, "Get DVM0 voltage reading")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanFloat(VOLT,0) $(P)")
+    field(EGU,  "V")
+    field(PREC, "3")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(ai, "$(P):DVM1:GetV") {
+    field(DESC, "Get DVM1 voltage reading")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readChanFloat(VOLT,1) $(P)")
+    field(EGU,  "V")
+    field(PREC, "3")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+# Operation complete query *OPC
+# Not included in periodic UpdateAll
+record(bi, "$(P):GetOpComplete") {
+    field(DESC, "Get op complete status")
+    field(DTYP, "stream")
+    field(INP,  "@sr620.proto readInt(*OPC) $(P)")
+    field(ZNAM, "IN PROGRESS")
+    field(ONAM, "COMPLETE")
+# Warning: Disabled for now as it does not reply
+# till all measurements are complete.
+# If not in auto-measurement, subsequent commands
+# see replies separated by semi-colons, not CR
+#    field(SCAN, ".5 second")
+}
+
+# Autocalibration procedure *CAL
+# This takes very long (minutes), so no readback in this record
+record(bo, "$(P):StartAutocal") {
+    field(DESC, "Start autocal sequence")
+    field(DTYP, "stream")
+    field(OUT,  "@sr620.proto writeCmd(*CAL?) $(P)")
+}
+
+# Measurement Offset Support
+# This allows for setting an arbitrary offset that is added to the
+# readback measurement values min, max, and mean.
+record(ai, "$(P):MeasOffset") {
+    field(DESC, "Measurement offset")
+    field(DTYP, "Soft Channel")
+    field(FLNK, "$(P):MeasOffsetUpdateFanout")
+    field(PINI, "YES")
+    info(autosaveFields, "VAL HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(fanout, "$(P):MeasOffsetUpdateFanout") {
+    field(DESC, "MeasOffset update fanout")
+    field(LNK1, "$(P):GetOffsetInvMeasMean")
+    field(LNK2, "$(P):GetOffsetInvMeasMax")
+    field(LNK3, "$(P):GetOffsetInvMeasMin")
+}
+
+record(calc, "$(P):GetOffsetInvMeasMean") {
+    field(DESC, "Last meas. mean + offset")
+    field(INPA, "$(P):GetMeasMean NPP")
+    field(INPB, "$(P):MeasOffset")
+    field(CALC, "-A+B")
+    field(HSV,  "MINOR")
+    field(LSV,  "MINOR")
+    info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(calcout, "$(P):GetOffsetInvMeasMean_nscalc") {
+	field( DESC, "Measured mean in ns" )
+	field( INPA, "$(P):GetOffsetInvMeasMean CPP MS" )
+	field( CALC, "A*1e9" )
+	field( OUT,  "$(P):GetOffsetInvMeasMean_ns PP MS" )
+}
+record(ai, "$(P):GetOffsetInvMeasMean_ns") {
+    field(DESC, "Last measurement mean")
+    field(EGU,  "ns")
+    field(PREC, "6")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(calc, "$(P):GetOffsetInvMeasMax") {
+    field(DESC, "Last meas. max + offset")
+    field(INPA, "$(P):GetMeasMax NPP")
+    field(INPB, "$(P):MeasOffset")
+    field(CALC, "-A+B")
+    field(HSV,  "MINOR")
+    field(LSV,  "MINOR")
+    info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(calcout, "$(P):GetOffsetInvMeasMax_nscalc") {
+	field( DESC, "Measured Max in ns" )
+	field( INPA, "$(P):GetOffsetInvMeasMax CPP MS" )
+	field( CALC, "A*1e9" )
+	field( OUT,  "$(P):GetOffsetInvMeasMax_ns PP MS" )
+}
+record(ai, "$(P):GetOffsetInvMeasMax_ns") {
+    field(DESC, "Last measurement Max")
+    field(EGU,  "ns")
+    field(PREC, "6")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(calc, "$(P):GetOffsetInvMeasMin") {
+    field(DESC, "Last meas. min + offset")
+    field(INPA, "$(P):GetMeasMin NPP")
+    field(INPB, "$(P):MeasOffset")
+    field(CALC, "-A+B")
+    field(HSV,  "MINOR")
+    field(LSV,  "MINOR")
+    info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(calcout, "$(P):GetOffsetInvMeasMin_nscalc") {
+	field( DESC, "Measured Min in ns" )
+	field( INPA, "$(P):GetOffsetInvMeasMin CPP MS" )
+	field( CALC, "A*1e9" )
+	field( OUT,  "$(P):GetOffsetInvMeasMin_ns PP MS" )
+}
+record(ai, "$(P):GetOffsetInvMeasMin_ns") {
+    field(DESC, "Last measurement Min")
+    field(EGU,  "ns")
+    field(PREC, "6")
+	info(autosaveFields, "DESC EGU HHSV HIGH HIHI HSV LLSV LOLO LOW LSV PREC")
+}
+
+record(bi, "$(P):DispOffsetInvMeas") {
+    field(DESC, "Display off/inv meas.")
+    field(ONAM, "INV/OFFSET")
+    field(ZNAM, "RAW MEAS.")
+    field(PINI, "YES")
+    info(autosaveFields, "VAL ZSV OSV")
+}
