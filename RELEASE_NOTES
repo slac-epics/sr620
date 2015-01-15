@@ -1,0 +1,13 @@
+#==============================================================
+#
+#  Name: RELEASE_NOTES
+#
+#  Rem: This files describes release notes for
+#       the SRS SR620 time interval counter module.
+#
+#
+#==============================================================
+#
+
+agilent53210a-R1-0-0, 2015-Jan-15, Garth Brown	(gwbrown):
+     Creaded this module from identical apps in several laser apps.
