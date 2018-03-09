@@ -8,6 +8,8 @@
 #
 #==============================================================
 #
+R1.1.0, 2018-Mar-08, Joao Rodrigues	(joaoprod):
+     Changes to new git workflow and epics 3.15	
 
 sr620-R1-0-0, 2015-Jan-15, Garth Brown	(gwbrown):
      Creaded this module from identical apps in several laser apps.
