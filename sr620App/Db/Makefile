@@ -17,17 +17,14 @@ DB += sr620.db
 # Create and install (or just install)
 # Archive files, templates, substitutions like this
 #
-ARCHIVE += sr620-ioc.archive
-ARCHIVE += sr620.tpl-arch
 
 #----------------------------------------------------
 # Create and install (or just install)
 # Autosave request files, templates, substitutions like this
 #
-REQ += sr620-ioc.req
-REQ += sr620.tpl-req
 
 include $(TOP)/configure/RULES
 #----------------------------------------
 #  ADD RULES AFTER THIS LINE
+
 
